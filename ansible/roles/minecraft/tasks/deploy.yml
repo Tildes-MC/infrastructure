@@ -63,7 +63,7 @@
 
 - name: Template server.properties
   ansible.builtin.template:
-    src: server.properties.j2
+    src: "{{ repo_root }}/apps/minecraft/server.properties.j2"
     dest: "{{ minecraft_app_dir }}/server.properties"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
@@ -85,7 +85,7 @@
 
 - name: Template stop.sh
   ansible.builtin.template:
-    src: stop.sh.j2
+    src: "{{ repo_root }}/apps/minecraft/scripts/stop.sh.j2"
     dest: "{{ minecraft_app_dir }}/scripts/stop.sh"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
@@ -93,7 +93,7 @@
 
 - name: Template backup_remote.sh
   ansible.builtin.template:
-    src: backup_remote.sh.j2
+    src: "{{ repo_root }}/apps/minecraft/scripts/backup_remote.sh.j2"
     dest: "{{ minecraft_app_dir }}/scripts/backup_remote.sh"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
@@ -105,6 +105,7 @@
     dest: "{{ minecraft_app_dir }}/plugins/"
     delete: false
     rsync_opts:
+      - "--exclude=*.j2"
       - "--exclude=*.db"
       - "--exclude=*.log"
       - "--exclude=sessions/"
@@ -122,19 +123,11 @@
 
 - name: Template bluemap sql.conf
   ansible.builtin.template:
-    src: bluemap-sql.conf.j2
+    src: "{{ repo_root }}/apps/minecraft/plugins/BlueMap/storages/sql.conf.j2"
     dest: "{{ minecraft_app_dir }}/plugins/BlueMap/storages/sql.conf"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
     mode: "0640"
-
-- name: Deploy collect_metrics env file
-  ansible.builtin.template:
-    src: collect_metrics_env.j2
-    dest: "{{ minecraft_app_dir }}/.collect_metrics_env"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0600"
 
 - name: Fix overall minecraft app ownership
   ansible.builtin.file:

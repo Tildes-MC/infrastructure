@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from typing import Dict, Tuple, List
 import socket
 import select
 import struct
@@ -7,7 +6,6 @@ import time
 import signal
 import re
 import sqlite3
-import time
 import os
 
 
@@ -47,6 +45,9 @@ class MCRcon(object):
             self.socket = None
 
     def _read(self, length: int) -> bytes:
+        if self.socket is None:
+          raise ValueError("self.socket is None")
+
         signal.alarm(self.timeout)
         data = b""
         while len(data) < length:
@@ -131,8 +132,8 @@ def init_sqlite(db: sqlite3.Connection):
 def insert_stats(
     db: sqlite3.Connection,
     timestamp: int,
-    players: List[str],
-    mspt: Tuple[float, float, float],
+    players: list[str],
+    mspt: tuple[float, ...],
 ):
     cursor = db.cursor()
 
@@ -151,13 +152,13 @@ def strip_color_codes(text: str) -> str:
     return re.sub("\xa7[0-9a-f]", "", text, flags=re.IGNORECASE)
 
 
-def mspt(rcon: MCRcon) -> Dict[str, Tuple[float, float, float]]:
+def mspt(rcon: MCRcon) -> dict[str, tuple[float, ...]] | None:
     response = strip_color_codes(rcon.command("mspt"))
 
     lines = response.split("\n")
     if lines[0] != "Server tick times (avg/min/max) from last 5s, 10s, 1m:":
         print("Unexpected response from server:", response)
-        return
+        return None
 
     # Remove the leading "◴ "
     stats_line = lines[1][len("◴ "):]
@@ -167,14 +168,14 @@ def mspt(rcon: MCRcon) -> Dict[str, Tuple[float, float, float]]:
     }
 
 
-def players_online(rcon: MCRcon) -> List[str]:
+def players_online(rcon: MCRcon) -> list[str] | None:
     response = rcon.command("list")
 
     match = re.match(
         r"There are (\d+) of a max of (\d+) players online: (.*)", response)
     if match is None:
         print("Unexpected response from server:", response)
-        return
+        return None
 
     return [name for name in match.group(3).split(", ") if len(name) > 0]
 
@@ -190,6 +191,8 @@ def main():
 
     with sqlite3.connect(database) as db:
         init_sqlite(db)
+
+        stats: dict[str, tuple[float, ...]] | None = None
 
         try:
             with MCRcon(RCON_HOST, RCON_PASSWORD, RCON_PORT) as rcon:
