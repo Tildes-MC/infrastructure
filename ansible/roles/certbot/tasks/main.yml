@@ -16,13 +16,27 @@
 - name: Obtain SSL certificate
   ansible.builtin.command:
     cmd: >
-      certbot --nginx
+      certbot certonly --nginx
       -d {{ domain }}
       --non-interactive
       --agree-tos
       --email {{ certbot_email }}
-      --redirect
   when: not certbot_cert.stat.exists
+
+- name: Re-check SSL certificate
+  ansible.builtin.stat:
+    path: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
+  register: ssl_cert
+  when: not certbot_cert.stat.exists
+
+- name: Update nginx config with SSL
+  ansible.builtin.template:
+    src: "{{ playbook_dir }}/../roles/nginx/templates/tildes.nore.gg.j2"
+    dest: "/etc/nginx/sites-available/{{ domain }}"
+    owner: root
+    group: root
+    mode: "0644"
+  when: not certbot_cert.stat.exists and (ssl_cert.stat.exists | default(false))
   notify: reload nginx
 
 - name: Enable certbot renewal timer
