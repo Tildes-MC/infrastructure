@@ -1,0 +1,6 @@
+---
+- name: restart web
+  ansible.builtin.systemd:
+    name: web
+    state: restarted
+    daemon_reload: true

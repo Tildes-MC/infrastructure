@@ -1,0 +1,169 @@
+#!/bin/bash
+
+##
+# CONFIGURATION NEEDED BEFORE USAGE
+##
+# Remote host where the backups will be send to
+REMOTE="u480249-sub2@u480249-sub2.your-storagebox.de"
+# Key that is trusted by the remote host
+KEY="/home/minecraft/.ssh/backup_transfer_key"
+SFTP_OPTS=(-i "$KEY" -q -oBatchMode=yes -oIdentitiesOnly=yes)
+# Remote host directory for the backups
+DIR="/backups"
+MAX_LOCAL_AGE_DAYS=2
+MAX_REMOTE_AGE_DAYS=7
+
+# setup for discord. Payload will need to be adjusted for other webhook endpoints.
+WEBHOOK_URL="https://discord.com/api/webhooks/1461631436913250306/4Wpau5frhXzzZNUmkfEUBKidkW9F900dn0SyNyOAe6NhucMfsakDJPwd081O_a-qLSpQ"
+
+set -euo pipefail
+shopt -s globstar
+shopt -s nullglob
+
+# Temp workfiles
+LIST_FILE=$(mktemp)
+BATCH_FILE=$(mktemp)
+
+# Start backup locally
+cd "$(dirname -- "$0")/.."
+
+log() {
+    echo "$(date +'%Y-%m-%d %H:%M:%S') $@"
+}
+
+# Adjust json payload for your specific webhook needs.
+webhook_alert() {
+    local message="$1"
+    if ! curl -sf -H "Content-Type: application/json" \
+        -d "{\"content\": \"$message\"}" \
+        "$WEBHOOK_URL" >/dev/null 2>&1; then
+        log "Warning: Discord webhook failed" >&2
+    fi
+}
+
+function send_command {
+    tmux send-keys -t minecraft "$1" Enter
+}
+
+function cleanup {
+    set +e
+    send_command 'save-on'
+    rm -f "$LIST_FILE" "$BATCH_FILE"
+    # Delete old backups
+    local retention_days="$MAX_LOCAL_AGE_DAYS"
+    find backups -name "backup-*.tar.gz" -type f -mtime +"$(expr $retention_days - 1)" -delete
+}
+
+trap cleanup EXIT
+
+send_command 'save-all'
+sleep 3
+
+send_command 'save-off'
+sleep 3
+
+mkdir -p backups
+TIMESTAMP=$(date '+%Y%m%d-%H-%M-%S')
+LOCAL_FILE="backups/backup-${TIMESTAMP}.tar.gz"
+
+# We need slightly less strict exiting here as tar will return 1 as a code when a file was modified while compressing.
+# Or so stackoverflow tells me. We'll check for 2 as exit code (an actual failure) after.
+log "start tar"
+set +e
+tar -czf "${LOCAL_FILE}" \
+    config/ \
+    plugins/*.jar \
+    plugins/**/*.txt \
+    plugins/**/*.yml \
+    plugins/**/*.json \
+    plugins/**/*.conf \
+    plugins/**/*.db \
+    scripts/ \
+    world/ \
+    world_nether/ \
+    world_the_end/ \
+    banned-ips.json \
+    banned-players.json \
+    bukkit.yml \
+    ops.json \
+    paper.jar \
+    server-icon.png \
+    server.properties \
+    spigot.yml \
+    whitelist.json
+
+TAR_EXIT_CODE=$?
+set -e
+
+# We already run save-on during cleanup.
+# But uploading takes a while so we enable it now again.
+send_command 'save-on'
+
+# Do some sanity checking
+# Let's see what tar has to say
+if [ $TAR_EXIT_CODE -ge 2 ]; then
+    log "TAR finished with a fatal code."
+    webhook_alert "TAR finished with a fatal code."
+    exit 1
+fi
+
+# Also not good if we don't have a file
+if [ ! -f "$LOCAL_FILE" ]; then
+    log "No backup file created."
+    webhook_alert "No backup file created."
+    exit 1
+fi
+
+log "Created backup: $LOCAL_FILE"
+# End of local backup
+
+# Lets secure the local backup remotely.
+
+# Upload backup first and while we are at it get a list of current remote backups.
+log "Starting SFTP upload."
+if ! sftp "${SFTP_OPTS[@]}" -b - "$REMOTE" <<EOF >"$LIST_FILE"; then
+put $LOCAL_FILE $DIR/
+cd $DIR
+ls -1
+EOF
+    log "Uploading backup failed."
+    webhook_alert "Uploading backup failed."
+    exit 1
+fi
+log "SFTP upload done."
+
+# Don't care about exact times, rounded to full day is fine.
+cutoff=$(date -d "$MAX_REMOTE_AGE_DAYS days ago" +%Y%m%d000000)
+
+# Lets look at our files making sure there are no stray other files
+# The regex might be a bit overkill, but if we ever end up renaming some things for some reason this prevents issues.
+CLEAN_LIST=$(grep -E "^backup-[0-9]{8}-[0-9]{2}-[0-9]{2}-[0-9]{2}\.tar\.gz$" "$LIST_FILE" || true)
+
+while read -r filename; do
+    # Date is all we need
+    temp="${filename#backup-}"
+    temp="${temp%.tar.gz}"
+    file_ts="${temp//-/}"
+
+    # (YYYYMMDDHHMMSS = 14 chars)
+    if [[ ${#file_ts} -eq 14 ]]; then
+        if [[ "$file_ts" < "$cutoff" ]]; then
+            log "Queueing deletion: $filename ($file_ts)"
+            webhook_alert "Queueing deletion: $filename ($file_ts)"
+            log "rm $DIR/$filename" >>"$BATCH_FILE"
+        fi
+    fi
+done <<<"$CLEAN_LIST"
+
+if [ -s "$BATCH_FILE" ]; then
+    log "Be gone old backups!"
+    if ! sftp "${SFTP_OPTS[@]}" -b "$BATCH_FILE" "$REMOTE"; then
+        log "Old backups don't want to be gone, this is bad."
+        webhook_alert "Old backups don't want to be gone, this is bad."
+    fi
+else
+    # Might throw in a webhook here because if this happens after we have been running this for longer than the cutoff.
+    log "No old backups found to delete."
+fi
+
+webhook_alert "Backup script done"

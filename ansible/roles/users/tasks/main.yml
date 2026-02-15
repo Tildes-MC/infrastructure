@@ -1,0 +1,52 @@
+---
+- name: Create minecraft group
+  ansible.builtin.group:
+    name: "{{ minecraft_group }}"
+    state: present
+
+- name: Create minecraft user
+  ansible.builtin.user:
+    name: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    home: "{{ minecraft_home }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Create minecraft app directory
+  ansible.builtin.file:
+    path: "{{ minecraft_app_dir }}"
+    state: directory
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0755"
+
+- name: Create minecraft script_logs directory
+  ansible.builtin.file:
+    path: "{{ minecraft_log_dir }}"
+    state: directory
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0755"
+
+- name: Create web group
+  ansible.builtin.group:
+    name: "{{ web_group }}"
+    state: present
+
+- name: Create web user
+  ansible.builtin.user:
+    name: "{{ web_user }}"
+    group: "{{ web_group }}"
+    home: "{{ web_home }}"
+    shell: /bin/bash
+    create_home: true
+    state: present
+
+- name: Create web app directory
+  ansible.builtin.file:
+    path: "{{ web_app_dir }}"
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: "0755"

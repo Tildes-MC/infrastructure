@@ -1,0 +1,14 @@
+[Unit]
+Description=Minecraft Server
+After=network.target
+
+[Service]
+User=minecraft
+Type=forking
+ExecStart=/usr/bin/tmux new-session -d -s minecraft -c /home/minecraft/app /home/minecraft/app/scripts/start.sh
+ExecStop=/home/minecraft/app/scripts/stop.sh
+NotifyAccess=all
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

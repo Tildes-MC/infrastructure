@@ -1,0 +1,15 @@
+---
+- name: Deploy Minecraft server
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Run minecraft deploy tasks
+      ansible.builtin.include_role:
+        name: minecraft
+        tasks_from: deploy
+
+    - name: Restart minecraft service
+      ansible.builtin.systemd:
+        name: minecraft
+        state: restarted

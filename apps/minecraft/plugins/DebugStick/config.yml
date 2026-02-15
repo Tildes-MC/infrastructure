@@ -1,0 +1,58 @@
+# Disables checking for players in creative
+Bypass_In_Creative: false
+
+# Message when a player tries to interact with a block or state on the blacklist
+Interaction_cancellation_messages:
+  enable: true
+  actionbar: true
+  messageBlock: "You cannot interact with this block"
+  messageState: "You cannot interact with this state"
+
+# List of worlds where the player cannot create water using the debug stick
+Prevent_water_in_world:
+  - "world_nether"
+ #- "custom_world_name"
+
+# Debug stick recipe config
+Debug_stick_craft:
+  enabled: true
+
+  # if grid is 2x2, line3 is ignored and the line length is 2 characters
+  grid_size: 2 # 3x3 => 3, 2x2 => 2, 1x1 => 1
+  shape:
+    line1: " N"  # craft grid
+    line2: "S "  # use space for empty slot
+    line3: "   "
+
+  # ingredient key for craft grid
+  ingredient:
+    N: "NETHER_STAR"
+    S: "STICK"
+
+# List of blocks that the player will not be able to interact with
+Blacklist_block:
+  - bee_nest
+  - beehive
+  - cake
+  - composter
+  - respawn_anchor
+  - end_portal_frame
+  - turtle_egg
+  - trial_spawner
+  - vault
+  - sculk_shrieker
+  - sea_pickle
+  - grass_block
+  - podzol
+  - water_cauldron
+  - wildflowers
+  - dried_ghast
+
+# List of block tags that the player will not be able to interact with
+Blacklist_tag_block:
+  - candles
+  - crops
+  - doors
+  - slabs
+  - tall_flowers
+

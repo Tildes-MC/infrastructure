@@ -1,0 +1,17 @@
+---
+- name: Provision Minecraft server
+  hosts: all
+  become: true
+
+  roles:
+    - common
+    - users
+    - ssh
+    - ufw
+    - java
+    - nodejs
+    - mysql
+    - nginx
+    - certbot
+    - minecraft
+    - web

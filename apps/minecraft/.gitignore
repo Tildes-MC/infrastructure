@@ -1,0 +1,16 @@
+/backups/
+/world/advancements/
+/world/data/
+/world/entities/
+/world/playerdata/
+/world/poi/
+/world/region/
+/world/stats/
+/world/*.*
+/world_nether/
+/world_the_end/
+
+/banned-ips.json
+/banned-players.json
+/ops.json
+/whitelist.json

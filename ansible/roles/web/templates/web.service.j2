@@ -1,0 +1,24 @@
+[Unit]
+Description=Tildes MC Website
+After=network.target
+
+[Service]
+Type=simple
+User={{ web_user }}
+Group={{ web_group }}
+WorkingDirectory={{ web_app_dir }}
+Environment=NODE_ENV=production
+Environment=PORT={{ web_port }}
+Environment=RCON_HOST=localhost
+Environment=RCON_PORT={{ rcon_port }}
+Environment=RCON_PASSWORD={{ vault_web_rcon_password }}
+Environment=USERNAME_SECRET={{ vault_web_username_secret }}
+ExecStart=/usr/bin/node {{ web_app_dir }}/.next/standalone/server.js
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=web
+
+[Install]
+WantedBy=multi-user.target

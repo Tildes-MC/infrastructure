@@ -1,0 +1,60 @@
+---
+- name: Synchronize web source
+  ansible.posix.synchronize:
+    src: "{{ repo_root }}/apps/web/"
+    dest: "{{ web_app_dir }}/"
+    delete: true
+    rsync_opts:
+      - "--exclude=node_modules/"
+      - "--exclude=.next/"
+      - "--exclude=.env"
+      - "--exclude=.git/"
+      - "--exclude=web.service"
+      - "--exclude=deploy.sh"
+      - "--chmod=D0755,F0644"
+
+- name: Fix web app ownership
+  ansible.builtin.file:
+    path: "{{ web_app_dir }}"
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    recurse: true
+
+- name: Install dependencies
+  ansible.builtin.command:
+    cmd: yarn install --immutable
+    chdir: "{{ web_app_dir }}"
+  become_user: "{{ web_user }}"
+  changed_when: true
+
+- name: Build web application
+  ansible.builtin.command:
+    cmd: yarn build
+    chdir: "{{ web_app_dir }}"
+  become_user: "{{ web_user }}"
+  changed_when: true
+
+- name: Copy public files to standalone directory
+  ansible.builtin.copy:
+    src: "{{ web_app_dir }}/public/"
+    dest: "{{ web_app_dir }}/.next/standalone/public/"
+    remote_src: true
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+
+- name: Ensure standalone .next directory exists
+  ansible.builtin.file:
+    path: "{{ web_app_dir }}/.next/standalone/.next"
+    state: directory
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"
+    mode: "0755"
+
+- name: Copy static files to standalone directory
+  ansible.builtin.copy:
+    src: "{{ web_app_dir }}/.next/static/"
+    dest: "{{ web_app_dir }}/.next/standalone/.next/static/"
+    remote_src: true
+    owner: "{{ web_user }}"
+    group: "{{ web_group }}"

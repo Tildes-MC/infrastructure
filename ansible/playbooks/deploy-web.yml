@@ -1,0 +1,15 @@
+---
+- name: Deploy web application
+  hosts: all
+  become: true
+
+  tasks:
+    - name: Run web deploy tasks
+      ansible.builtin.include_role:
+        name: web
+        tasks_from: deploy
+
+    - name: Restart web service
+      ansible.builtin.systemd:
+        name: web
+        state: restarted

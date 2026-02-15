@@ -1,0 +1,43 @@
+---
+- name: Install ufw
+  ansible.builtin.apt:
+    name: ufw
+    state: present
+
+- name: Set ufw default deny incoming
+  community.general.ufw:
+    direction: incoming
+    default: deny
+
+- name: Set ufw default allow outgoing
+  community.general.ufw:
+    direction: outgoing
+    default: allow
+
+- name: Allow SSH
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+
+- name: Allow HTTP
+  community.general.ufw:
+    rule: allow
+    port: "80"
+    proto: tcp
+
+- name: Allow HTTPS
+  community.general.ufw:
+    rule: allow
+    port: "443"
+    proto: tcp
+
+- name: Allow Minecraft
+  community.general.ufw:
+    rule: allow
+    port: "{{ minecraft_port | string }}"
+    proto: tcp
+
+- name: Enable ufw
+  community.general.ufw:
+    state: enabled

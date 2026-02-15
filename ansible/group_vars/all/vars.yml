@@ -1,0 +1,23 @@
+domain: tildes.nore.gg
+certbot_email: admin@tildes.nore.gg
+
+minecraft_user: minecraft
+minecraft_group: "{{ minecraft_user }}"
+minecraft_home: "/home/{{ minecraft_user }}"
+minecraft_app_dir: "/home/{{ minecraft_user }}/app"
+minecraft_log_dir: "/home/{{ minecraft_user }}/script_logs"
+
+web_user: web
+web_group: "{{ web_user }}"
+web_home: "/home/{{ web_user }}"
+web_app_dir: "/home/{{ web_user }}/app"
+
+minecraft_port: 25565
+web_port: 3000
+bluemap_port: 8100
+
+java_package: openjdk-21-jre-headless
+node_major_version: "22"
+minecraft_memory: "13G"
+
+repo_root: "{{ playbook_dir }}/../.."

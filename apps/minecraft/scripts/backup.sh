@@ -1,0 +1,47 @@
+#!/bin/bash
+set -euo pipefail
+shopt -s globstar
+
+cd "$( dirname -- "$0" )/.."
+
+function send_command {
+    tmux send-keys -t minecraft "$1" Enter
+}
+
+function cleanup {
+    send_command 'save-on'
+    # Delete old backups
+    local retention_days='2'
+    find backups -name "backup-*.tar.gz" -type f -mtime +"$(expr $retention_days - 1)" -delete
+}
+trap cleanup EXIT
+
+send_command 'save-all'
+sleep 3
+
+send_command 'save-off'
+sleep 3
+
+mkdir -p backups
+TIMESTAMP=$(date '+%Y%m%d-%H-%M-%S')
+tar -czf backups/backup-${TIMESTAMP}.tar.gz \
+    config/ \
+    plugins/*.jar \
+    plugins/**/*.txt \
+    plugins/**/*.yml \
+    plugins/**/*.json \
+    plugins/**/*.conf \
+    plugins/**/*.db \
+    scripts/ \
+    world/ \
+    world_nether/ \
+    world_the_end/ \
+    banned-ips.json \
+    banned-players.json \
+    bukkit.yml \
+    ops.json \
+    paper.jar \
+    server-icon.png \
+    server.properties \
+    spigot.yml \
+    whitelist.json

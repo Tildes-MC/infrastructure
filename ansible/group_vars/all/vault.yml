@@ -1,0 +1,11 @@
+# Encrypt this file with: ansible-vault encrypt ansible/group_vars/all/vault.yml
+# Fill in real values before encrypting.
+
+vault_rcon_password: "CHANGE_ME"
+vault_level_seed: ""
+vault_management_server_secret: "CHANGE_ME"
+vault_bluemap_db_password: "CHANGE_ME"
+vault_backup_remote_host: "CHANGE_ME"
+vault_backup_webhook_url: "CHANGE_ME"
+vault_web_username_secret: "CHANGE_ME"
+vault_web_rcon_password: "CHANGE_ME"

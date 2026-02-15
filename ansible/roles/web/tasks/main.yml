@@ -1,0 +1,27 @@
+---
+- name: Deploy web systemd service
+  ansible.builtin.template:
+    src: web.service.j2
+    dest: /etc/systemd/system/web.service
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart web
+
+- name: Deploy web sudoers rule
+  ansible.builtin.copy:
+    content: "{{ web_user }} ALL=(ALL) NOPASSWD: /usr/bin/systemctl restart web\n"
+    dest: /etc/sudoers.d/web
+    owner: root
+    group: root
+    mode: "0440"
+    validate: "visudo -cf %s"
+
+- name: Include deploy tasks
+  ansible.builtin.include_tasks: deploy.yml
+
+- name: Enable web service
+  ansible.builtin.systemd:
+    name: web
+    enabled: true
+    daemon_reload: true

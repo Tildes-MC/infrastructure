@@ -1,0 +1,36 @@
+{
+  "name": "tildes-mc",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "type-check": "tsc"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "dotenv": "^17.2.3",
+    "jsdom": "^27.3.0",
+    "next": "16.1.1",
+    "postcss": "^8.5.6",
+    "rcon-client": "^4.2.5",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.10",
+    "@types/jsdom": "^27.0.0",
+    "@types/node": "^24.10.4",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "yarn@4.6.0",
+  "engines": {
+    "node": ">=22.0.0"
+  }
+}

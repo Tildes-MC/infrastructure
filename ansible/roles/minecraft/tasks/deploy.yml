@@ -1,0 +1,145 @@
+---
+- name: Ensure minecraft directory structure exists
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0755"
+  loop:
+    - "{{ minecraft_app_dir }}"
+    - "{{ minecraft_app_dir }}/scripts"
+    - "{{ minecraft_app_dir }}/config"
+    - "{{ minecraft_app_dir }}/plugins"
+    - "{{ minecraft_log_dir }}"
+
+- name: Copy paper.jar
+  ansible.builtin.copy:
+    src: "{{ repo_root }}/apps/minecraft/paper.jar"
+    dest: "{{ minecraft_app_dir }}/paper.jar"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0644"
+
+- name: Copy server-icon.png
+  ansible.builtin.copy:
+    src: "{{ repo_root }}/apps/minecraft/server-icon.png"
+    dest: "{{ minecraft_app_dir }}/server-icon.png"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0644"
+
+- name: Copy bukkit.yml
+  ansible.builtin.copy:
+    src: "{{ repo_root }}/apps/minecraft/bukkit.yml"
+    dest: "{{ minecraft_app_dir }}/bukkit.yml"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0644"
+
+- name: Copy spigot.yml
+  ansible.builtin.copy:
+    src: "{{ repo_root }}/apps/minecraft/spigot.yml"
+    dest: "{{ minecraft_app_dir }}/spigot.yml"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0644"
+
+- name: Synchronize config directory
+  ansible.posix.synchronize:
+    src: "{{ repo_root }}/apps/minecraft/config/"
+    dest: "{{ minecraft_app_dir }}/config/"
+    delete: true
+    rsync_opts:
+      - "--chmod=D0755,F0644"
+
+- name: Fix config directory ownership
+  ansible.builtin.file:
+    path: "{{ minecraft_app_dir }}/config"
+    state: directory
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    recurse: true
+
+- name: Template server.properties
+  ansible.builtin.template:
+    src: server.properties.j2
+    dest: "{{ minecraft_app_dir }}/server.properties"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0640"
+
+- name: Copy scripts
+  ansible.builtin.copy:
+    src: "{{ repo_root }}/apps/minecraft/scripts/{{ item }}"
+    dest: "{{ minecraft_app_dir }}/scripts/{{ item }}"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0755"
+  loop:
+    - start.sh
+    - command.sh
+    - restart.sh
+    - backup.sh
+    - collect_metrics.py
+
+- name: Template stop.sh
+  ansible.builtin.template:
+    src: stop.sh.j2
+    dest: "{{ minecraft_app_dir }}/scripts/stop.sh"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0755"
+
+- name: Template backup_remote.sh
+  ansible.builtin.template:
+    src: backup_remote.sh.j2
+    dest: "{{ minecraft_app_dir }}/scripts/backup_remote.sh"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0755"
+
+- name: Synchronize plugins directory
+  ansible.posix.synchronize:
+    src: "{{ repo_root }}/apps/minecraft/plugins/"
+    dest: "{{ minecraft_app_dir }}/plugins/"
+    delete: false
+    rsync_opts:
+      - "--exclude=*.db"
+      - "--exclude=*.log"
+      - "--exclude=sessions/"
+      - "--exclude=maps/"
+      - "--exclude=tmp/"
+      - "--chmod=D0755,F0644"
+
+- name: Fix plugins directory ownership
+  ansible.builtin.file:
+    path: "{{ minecraft_app_dir }}/plugins"
+    state: directory
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    recurse: true
+
+- name: Template bluemap sql.conf
+  ansible.builtin.template:
+    src: bluemap-sql.conf.j2
+    dest: "{{ minecraft_app_dir }}/plugins/BlueMap/storages/sql.conf"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0640"
+
+- name: Deploy collect_metrics env file
+  ansible.builtin.template:
+    src: collect_metrics_env.j2
+    dest: "{{ minecraft_app_dir }}/.collect_metrics_env"
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    mode: "0600"
+
+- name: Fix overall minecraft app ownership
+  ansible.builtin.file:
+    path: "{{ minecraft_app_dir }}"
+    state: directory
+    owner: "{{ minecraft_user }}"
+    group: "{{ minecraft_group }}"
+    recurse: true

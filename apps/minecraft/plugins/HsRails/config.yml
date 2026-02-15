@@ -1,0 +1,4 @@
+speedMultiplier: 4.0
+boostBlock: "minecraft:bamboo_block"
+hardBrakeMultiplier: 8.0
+hardBrakeBlock: "minecraft:soul_sand"
