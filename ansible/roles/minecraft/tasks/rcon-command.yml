@@ -12,4 +12,9 @@
   become: true
   become_user: "{{ minecraft_user }}"
   register: minecraft_command_result
-  changed_when: true
+  changed_when: unchanged_output is not defined or unchanged_output not in minecraft_command_result.stdout
+  failed_when: >-
+    minecraft_command_result.rc != 0 or
+    (expected_output is defined and
+     expected_output not in minecraft_command_result.stdout and
+     (unchanged_output is not defined or unchanged_output not in minecraft_command_result.stdout))

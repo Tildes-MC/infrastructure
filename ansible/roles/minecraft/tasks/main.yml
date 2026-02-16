@@ -43,3 +43,11 @@
   ansible.builtin.include_tasks: rcon-command.yml
   vars:
     minecraft_command: "lp import init"
+
+- name: Op admin users
+  ansible.builtin.include_tasks: rcon-command.yml
+  vars:
+    minecraft_command: "op {{ item.name }}"
+    expected_output: "Made {{ item.name }} a server operator"
+    unchanged_output: "Nothing changed"
+  loop: "{{ admin_users }}"
