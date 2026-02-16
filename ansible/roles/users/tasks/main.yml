@@ -1,4 +1,22 @@
 ---
+- name: Create admin users
+  ansible.builtin.user:
+    name: "{{ item.name }}"
+    groups: sudo
+    append: true
+    shell: /bin/bash
+    create_home: true
+    state: present
+  loop: "{{ admin_users }}"
+
+- name: Set authorized keys for admin users
+  ansible.posix.authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ item.ssh_key }}"
+    state: present
+    exclusive: true
+  loop: "{{ admin_users }}"
+
 - name: Create minecraft group
   ansible.builtin.group:
     name: "{{ minecraft_group }}"
