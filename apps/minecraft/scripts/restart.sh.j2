@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export RCON_PASSWORD="{{ vault_rcon_password }}"
 "$( dirname -- "$0" )/rcon.py" 'say Restarting server in 15 seconds...'
+
 sleep 15
-sudo systemctl restart minecraft
+
+sudo /usr/bin/systemctl restart minecraft

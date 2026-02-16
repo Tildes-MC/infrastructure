@@ -1,5 +1,6 @@
 #!/bin/bash
 
+export RCON_PASSWORD="{{ vault_rcon_password }}"
 "$( dirname -- "$0" )/rcon.py" 'stop'
 
 # Wait for Minecraft to terminate

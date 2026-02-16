@@ -4,6 +4,7 @@ shopt -s globstar
 
 cd "$( dirname -- "$0" )/.."
 
+export RCON_PASSWORD="{{ vault_rcon_password }}"
 RCON="scripts/rcon.py"
 
 function cleanup {

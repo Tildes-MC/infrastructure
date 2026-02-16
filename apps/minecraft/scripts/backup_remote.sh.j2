@@ -42,6 +42,7 @@ webhook_alert() {
     fi
 }
 
+export RCON_PASSWORD="{{ vault_rcon_password }}"
 RCON="$(dirname -- "$0")/rcon.py"
 
 function cleanup {
