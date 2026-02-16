@@ -10,8 +10,8 @@ WorkingDirectory={{ web_app_dir }}
 Environment=NODE_ENV=production
 Environment=PORT={{ web_port }}
 Environment=RCON_HOST=localhost
-Environment=RCON_PORT={{ rcon_port }}
-Environment=RCON_PASSWORD={{ vault_web_rcon_password }}
+Environment=RCON_PORT=25575
+Environment=RCON_PASSWORD={{ vault_rcon_password }}
 Environment=USERNAME_SECRET={{ vault_web_username_secret }}
 ExecStart=/usr/bin/node {{ web_app_dir }}/.next/standalone/server.js
 Restart=always

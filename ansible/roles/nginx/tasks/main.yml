@@ -6,6 +6,13 @@
     update_cache: true
     cache_valid_time: 3600
 
+- name: Add www-data to web group
+  ansible.builtin.user:
+    name: www-data
+    groups: "{{ web_group }}"
+    append: true
+  notify: restart nginx
+
 - name: Remove default nginx site
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
@@ -19,7 +26,7 @@
 
 - name: Deploy site config
   ansible.builtin.template:
-    src: tildes.nore.gg.j2
+    src: site.j2
     dest: "/etc/nginx/sites-available/{{ domain }}"
     owner: root
     group: root
@@ -36,5 +43,5 @@
 - name: Ensure nginx is started and enabled
   ansible.builtin.systemd:
     name: nginx
-    state: started
+    state: restarted
     enabled: true

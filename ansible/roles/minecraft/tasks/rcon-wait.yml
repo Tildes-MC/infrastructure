@@ -1,0 +1,15 @@
+---
+# Wait for the Minecraft server to accept RCON connections.
+
+- name: Wait for RCON to be available
+  ansible.builtin.command:
+    cmd: "{{ minecraft_app_dir }}/scripts/rcon.py list"
+  environment:
+    RCON_PASSWORD: "{{ vault_rcon_password }}"
+  become: true
+  become_user: "{{ minecraft_user }}"
+  register: rcon_wait
+  until: rcon_wait.rc == 0
+  retries: 30
+  delay: 4
+  changed_when: false

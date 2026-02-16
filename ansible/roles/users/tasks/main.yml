@@ -43,6 +43,11 @@
     create_home: true
     state: present
 
+- name: Allow group traversal of web home directory
+  ansible.builtin.file:
+    path: "{{ web_home }}"
+    mode: "0710"
+
 - name: Create web app directory
   ansible.builtin.file:
     path: "{{ web_app_dir }}"

@@ -4,22 +4,20 @@ shopt -s globstar
 
 cd "$( dirname -- "$0" )/.."
 
-function send_command {
-    tmux send-keys -t minecraft "$1" Enter
-}
+RCON="scripts/rcon.py"
 
 function cleanup {
-    send_command 'save-on'
+    $RCON 'save-on'
     # Delete old backups
     local retention_days='2'
     find backups -name "backup-*.tar.gz" -type f -mtime +"$(expr $retention_days - 1)" -delete
 }
 trap cleanup EXIT
 
-send_command 'save-all'
+$RCON 'save-all'
 sleep 3
 
-send_command 'save-off'
+$RCON 'save-off'
 sleep 3
 
 mkdir -p backups

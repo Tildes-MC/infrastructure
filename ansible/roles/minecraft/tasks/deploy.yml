@@ -1,5 +1,5 @@
 ---
-- name: Ensure minecraft directory structure exists
+- name: Ensure minecraft directories exist
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
@@ -8,131 +8,66 @@
     mode: "0755"
   loop:
     - "{{ minecraft_app_dir }}"
-    - "{{ minecraft_app_dir }}/scripts"
-    - "{{ minecraft_app_dir }}/config"
-    - "{{ minecraft_app_dir }}/plugins"
     - "{{ minecraft_log_dir }}"
 
-- name: Copy paper.jar
-  ansible.builtin.copy:
-    src: "{{ repo_root }}/apps/minecraft/paper.jar"
-    dest: "{{ minecraft_app_dir }}/paper.jar"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0644"
-
-- name: Copy server-icon.png
-  ansible.builtin.copy:
-    src: "{{ repo_root }}/apps/minecraft/server-icon.png"
-    dest: "{{ minecraft_app_dir }}/server-icon.png"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0644"
-
-- name: Copy bukkit.yml
-  ansible.builtin.copy:
-    src: "{{ repo_root }}/apps/minecraft/bukkit.yml"
-    dest: "{{ minecraft_app_dir }}/bukkit.yml"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0644"
-
-- name: Copy spigot.yml
-  ansible.builtin.copy:
-    src: "{{ repo_root }}/apps/minecraft/spigot.yml"
-    dest: "{{ minecraft_app_dir }}/spigot.yml"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0644"
-
-- name: Synchronize config directory
+- name: Synchronize minecraft app
   ansible.posix.synchronize:
-    src: "{{ repo_root }}/apps/minecraft/config/"
-    dest: "{{ minecraft_app_dir }}/config/"
+    src: "{{ repo_root }}/apps/minecraft/"
+    dest: "{{ minecraft_app_dir }}/"
     delete: true
     rsync_opts:
-      - "--chmod=D0755,F0644"
-
-- name: Fix config directory ownership
-  ansible.builtin.file:
-    path: "{{ minecraft_app_dir }}/config"
-    state: directory
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    recurse: true
-
-- name: Template server.properties
-  ansible.builtin.template:
-    src: "{{ repo_root }}/apps/minecraft/server.properties.j2"
-    dest: "{{ minecraft_app_dir }}/server.properties"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0640"
-
-- name: Copy scripts
-  ansible.builtin.copy:
-    src: "{{ repo_root }}/apps/minecraft/scripts/{{ item }}"
-    dest: "{{ minecraft_app_dir }}/scripts/{{ item }}"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0755"
-  loop:
-    - start.sh
-    - command.sh
-    - restart.sh
-    - backup.sh
-    - collect_metrics.py
-
-- name: Template stop.sh
-  ansible.builtin.template:
-    src: "{{ repo_root }}/apps/minecraft/scripts/stop.sh.j2"
-    dest: "{{ minecraft_app_dir }}/scripts/stop.sh"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0755"
-
-- name: Template backup_remote.sh
-  ansible.builtin.template:
-    src: "{{ repo_root }}/apps/minecraft/scripts/backup_remote.sh.j2"
-    dest: "{{ minecraft_app_dir }}/scripts/backup_remote.sh"
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
-    mode: "0755"
-
-- name: Synchronize plugins directory
-  ansible.posix.synchronize:
-    src: "{{ repo_root }}/apps/minecraft/plugins/"
-    dest: "{{ minecraft_app_dir }}/plugins/"
-    delete: false
-    rsync_opts:
+      - "--filter=':- .gitignore'"
       - "--exclude=*.j2"
-      - "--exclude=*.db"
-      - "--exclude=*.log"
-      - "--exclude=sessions/"
-      - "--exclude=maps/"
-      - "--exclude=tmp/"
       - "--chmod=D0755,F0644"
 
-- name: Fix plugins directory ownership
-  ansible.builtin.file:
-    path: "{{ minecraft_app_dir }}/plugins"
-    state: directory
-    owner: "{{ minecraft_user }}"
-    group: "{{ minecraft_group }}"
+- name: Find all .j2 templates
+  ansible.builtin.find:
+    paths: "{{ repo_root }}/apps/minecraft"
+    patterns: "*.j2"
     recurse: true
+  delegate_to: localhost
+  become: false
+  register: j2_templates
 
-- name: Template bluemap sql.conf
+- name: Template .j2 files
   ansible.builtin.template:
-    src: "{{ repo_root }}/apps/minecraft/plugins/BlueMap/storages/sql.conf.j2"
-    dest: "{{ minecraft_app_dir }}/plugins/BlueMap/storages/sql.conf"
+    src: "{{ item.path }}"
+    dest: "{{ minecraft_app_dir }}/{{ item.path | relpath(repo_root + '/apps/minecraft') | regex_replace('\\.j2$', '') }}"
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
-    mode: "0640"
+    mode: "{{ '0755' if item.path.endswith('.sh.j2') else '0640' }}"
+  loop: "{{ j2_templates.files }}"
+  loop_control:
+    label: "{{ item.path | relpath(repo_root + '/apps/minecraft') }}"
 
-- name: Fix overall minecraft app ownership
+- name: Find script files
+  ansible.builtin.find:
+    paths: "{{ minecraft_app_dir }}/scripts"
+    patterns:
+      - "*.sh"
+      - "*.py"
+  register: script_files
+
+- name: Make scripts executable
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    mode: "0755"
+  loop: "{{ script_files.files }}"
+  loop_control:
+    label: "{{ item.path | basename }}"
+
+- name: Fix minecraft app ownership
   ansible.builtin.file:
     path: "{{ minecraft_app_dir }}"
     state: directory
     owner: "{{ minecraft_user }}"
     group: "{{ minecraft_group }}"
     recurse: true
+
+- name: Deploy minecraft crontab
+  ansible.builtin.template:
+    src: minecraft-cron.j2
+    dest: "/var/spool/cron/crontabs/{{ minecraft_user }}"
+    owner: root
+    group: crontab
+    mode: "0600"

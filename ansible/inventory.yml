@@ -1,5 +1,5 @@
 all:
   hosts:
     tildes:
-      ansible_host: tildes.nore.gg
+      ansible_host: test.nore.gg
       ansible_user: root

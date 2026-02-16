@@ -14,29 +14,16 @@
     direction: outgoing
     default: allow
 
-- name: Allow SSH
+- name: Allow incoming traffic
   community.general.ufw:
     rule: allow
-    port: "22"
-    proto: tcp
-
-- name: Allow HTTP
-  community.general.ufw:
-    rule: allow
-    port: "80"
-    proto: tcp
-
-- name: Allow HTTPS
-  community.general.ufw:
-    rule: allow
-    port: "443"
-    proto: tcp
-
-- name: Allow Minecraft
-  community.general.ufw:
-    rule: allow
-    port: "{{ minecraft_port | string }}"
-    proto: tcp
+    port: "{{ item.port }}"
+    proto: "{{ item.proto }}"
+  loop:
+    - { port: "22", proto: tcp }
+    - { port: "80", proto: tcp }
+    - { port: "443", proto: tcp }
+    - { port: "{{ minecraft_port | string }}", proto: tcp }
 
 - name: Enable ufw
   community.general.ufw:

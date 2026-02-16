@@ -31,10 +31,6 @@ export default function Verify() {
       }),
     });
 
-    try {
-      throw new Error("Foo");
-    } catch (_e) {}
-
     if (checkOnlineResponse.status !== 200) {
       setStatus("Something went wrong, please try again later.");
       setBio("");

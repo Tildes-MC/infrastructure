@@ -3,6 +3,9 @@
   hosts: all
   become: true
 
+  vars:
+    restart: false
+
   tasks:
     - name: Run minecraft deploy tasks
       ansible.builtin.include_role:
@@ -13,3 +16,4 @@
       ansible.builtin.systemd:
         name: minecraft
         state: restarted
+      when: restart | bool

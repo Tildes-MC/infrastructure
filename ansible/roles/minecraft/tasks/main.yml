@@ -20,16 +20,26 @@
 - name: Include deploy tasks
   ansible.builtin.include_tasks: deploy.yml
 
-- name: Deploy minecraft crontab
-  ansible.builtin.template:
-    src: minecraft-cron.j2
-    dest: "/var/spool/cron/crontabs/{{ minecraft_user }}"
-    owner: root
-    group: crontab
-    mode: "0600"
-
-- name: Enable minecraft service
+- name: Enable and restart minecraft service
   ansible.builtin.systemd:
     name: minecraft
     enabled: true
+    state: restarted
     daemon_reload: true
+
+- name: Wait for minecraft server to accept RCON connections
+  ansible.builtin.include_tasks: rcon-wait.yml
+
+- name: Check if LuckPerms groups are already configured
+  ansible.builtin.stat:
+    path: "{{ minecraft_app_dir }}/{{ item }}"
+  loop:
+    - plugins/LuckPerms/json-storage/groups/player.json
+    - plugins/LuckPerms/json-storage/groups/moderator.json
+  register: luckperms_groups
+
+- name: Import LuckPerms permissions on fresh setup
+  when: luckperms_groups.results | selectattr('stat.exists', 'false') | list | length > 0
+  ansible.builtin.include_tasks: rcon-command.yml
+  vars:
+    minecraft_command: "lp import init"

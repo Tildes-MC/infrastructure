@@ -9,7 +9,6 @@
       - "--exclude=.next/"
       - "--exclude=.env"
       - "--exclude=.git/"
-      - "--exclude=web.service"
       - "--exclude=deploy.sh"
       - "--chmod=D0755,F0644"
 
@@ -27,6 +26,8 @@
     chdir: "{{ web_app_dir }}"
   become_user: "{{ web_user }}"
   changed_when: true
+  environment:
+    COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
 - name: Build web application
   ansible.builtin.command:
@@ -34,6 +35,8 @@
     chdir: "{{ web_app_dir }}"
   become_user: "{{ web_user }}"
   changed_when: true
+  environment:
+    COREPACK_ENABLE_DOWNLOAD_PROMPT: "0"
 
 - name: Copy public files to standalone directory
   ansible.builtin.copy:
@@ -58,3 +61,9 @@
     remote_src: true
     owner: "{{ web_user }}"
     group: "{{ web_group }}"
+
+- name: Restart web service
+  ansible.builtin.systemd:
+    name: web
+    state: restarted
+    daemon_reload: true

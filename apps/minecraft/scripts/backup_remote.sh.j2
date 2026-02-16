@@ -16,6 +16,7 @@ MAX_REMOTE_AGE_DAYS=7
 # setup for discord. Payload will need to be adjusted for other webhook endpoints.
 WEBHOOK_URL="{{ vault_backup_webhook_url }}"
 
+{% raw %}
 set -euo pipefail
 shopt -s globstar
 shopt -s nullglob
@@ -41,13 +42,11 @@ webhook_alert() {
     fi
 }
 
-function send_command {
-    tmux send-keys -t minecraft "$1" Enter
-}
+RCON="$(dirname -- "$0")/rcon.py"
 
 function cleanup {
     set +e
-    send_command 'save-on'
+    $RCON 'save-on'
     rm -f "$LIST_FILE" "$BATCH_FILE"
     # Delete old backups
     local retention_days="$MAX_LOCAL_AGE_DAYS"
@@ -56,10 +55,10 @@ function cleanup {
 
 trap cleanup EXIT
 
-send_command 'save-all'
+$RCON 'save-all'
 sleep 3
 
-send_command 'save-off'
+$RCON 'save-off'
 sleep 3
 
 mkdir -p backups
@@ -97,7 +96,7 @@ set -e
 
 # We already run save-on during cleanup.
 # But uploading takes a while so we enable it now again.
-send_command 'save-on'
+$RCON 'save-on'
 
 # Do some sanity checking
 # Let's see what tar has to say
@@ -167,3 +166,4 @@ else
 fi
 
 webhook_alert "Backup script done"
+{% endraw %}

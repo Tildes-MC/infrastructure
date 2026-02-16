@@ -2,7 +2,10 @@
 
 cd "$( dirname -- "$0" )/.."
 
-MEM='13G'
+if [ -z "$MEM" ]; then
+  echo "MEM environment variable is not set"
+  exit 1
+fi
 
 java \
   -Xms"$MEM" \

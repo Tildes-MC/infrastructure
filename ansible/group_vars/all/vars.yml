@@ -1,5 +1,5 @@
-domain: tildes.nore.gg
-certbot_email: admin@tildes.nore.gg
+domain: test.nore.gg
+certbot_email: me@danangell.com
 
 minecraft_user: minecraft
 minecraft_group: "{{ minecraft_user }}"
@@ -18,6 +18,7 @@ bluemap_port: 8100
 
 java_package: openjdk-21-jre-headless
 node_major_version: "22"
-minecraft_memory: "13G"
+minecraft_memory: "6G"
+minecraft_tmux_session: "minecraft"
 
 repo_root: "{{ playbook_dir }}/../.."

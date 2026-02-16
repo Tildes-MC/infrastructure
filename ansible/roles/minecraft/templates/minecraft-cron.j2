@@ -1,9 +1,10 @@
- 55 20    *   *   *   {{ minecraft_app_dir }}/scripts/command.sh tellraw @a '{"text":"Restarting server in 5 minutes...","color":"yellow"}'
- 58 20    *   *   *   {{ minecraft_app_dir }}/scripts/command.sh tellraw @a '{"text":"Restarting server in 2 minutes...","color":"yellow"}'
- 59 20    *   *   *   {{ minecraft_app_dir }}/scripts/command.sh tellraw @a '{"text":"Restarting server in 1 minute...","color":"yellow"}'
+RCON_PASSWORD={{ vault_rcon_password }}
+ 55 20    *   *   *   {{ minecraft_app_dir }}/scripts/rcon.py 'tellraw @a {"text":"Restarting server in 5 minutes...","color":"yellow"}'
+ 58 20    *   *   *   {{ minecraft_app_dir }}/scripts/rcon.py 'tellraw @a {"text":"Restarting server in 2 minutes...","color":"yellow"}'
+ 59 20    *   *   *   {{ minecraft_app_dir }}/scripts/rcon.py 'tellraw @a {"text":"Restarting server in 1 minute...","color":"yellow"}'
   0 21    *   *   *   sudo /usr/bin/systemctl restart minecraft
-  *  *    *   *   *   RCON_PASSWORD={{ vault_rcon_password }} {{ minecraft_app_dir }}/scripts/collect_metrics.py
-  0  */4  *   *   *   {{ minecraft_app_dir }}/scripts/command.sh tellraw @a '[{"text":"Please set up a recurring donation on our ","color":"green"},{"text":"Patreon","color":"blue","underlined":true,"click_event":{"action":"open_url","url":"https://www.patreon.com/TildesMC"}},{"text":" if you can!","color":"green"}]'
-  0  5    *   *   *   {{ minecraft_app_dir }}/scripts/command.sh co purge t:30d
+  *  *    *   *   *   {{ minecraft_app_dir }}/scripts/collect_metrics.py
+  0  */4  *   *   *   {{ minecraft_app_dir }}/scripts/rcon.py 'tellraw @a [{"text":"Please set up a recurring donation on our ","color":"green"},{"text":"Patreon","color":"blue","underlined":true,"click_event":{"action":"open_url","url":"https://www.patreon.com/TildesMC"}},{"text":" if you can!","color":"green"}]'
+  0  5    *   *   *   {{ minecraft_app_dir }}/scripts/rcon.py 'co purge t:30d'
   0  6    *   *   *   find {{ minecraft_app_dir }}/logs -type f -mtime +30 -delete
  30  5    *   *   *   {{ minecraft_app_dir }}/scripts/backup_remote.sh >> {{ minecraft_log_dir }}/remote_backup.log 2>&1

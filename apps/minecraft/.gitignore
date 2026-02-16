@@ -1,4 +1,12 @@
 /backups/
+/versions/
+/cache/
+/crash-reports/
+/libraries/
+/logs/
+/bluemap/
+
+# World data
 /world/advancements/
 /world/data/
 /world/entities/
@@ -10,7 +18,26 @@
 /world_nether/
 /world_the_end/
 
+# Server runtime files
 /banned-ips.json
 /banned-players.json
 /ops.json
 /whitelist.json
+/commands.txt
+/commands.yml
+/wepif.yml
+
+# Plugin runtime data
+/plugins/**/tmp/
+/plugins/**/*.db
+/plugins/**/*.log
+/plugins/spark/
+/plugins/BlueMap/maps/
+/plugins/HexNicks/logs/
+/plugins/HexNicks/nicknames.json
+/plugins/LuckPerms/editor-keystore.json
+/plugins/LuckPerms/json-storage/
+/plugins/WorldEdit/sessions/
+
+# Scripts runtime data
+/scripts/stats.db

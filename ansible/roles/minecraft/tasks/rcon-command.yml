@@ -1,0 +1,15 @@
+---
+# Execute a command on the running Minecraft server via RCON.
+#
+# Required variables:
+#   minecraft_command: The command to send (e.g. "lp import init")
+
+- name: "Execute minecraft command: {{ minecraft_command }}"
+  ansible.builtin.command:
+    cmd: "{{ minecraft_app_dir }}/scripts/rcon.py '{{ minecraft_command }}'"
+  environment:
+    RCON_PASSWORD: "{{ vault_rcon_password }}"
+  become: true
+  become_user: "{{ minecraft_user }}"
+  register: minecraft_command_result
+  changed_when: true

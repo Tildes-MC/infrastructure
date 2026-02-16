@@ -27,16 +27,15 @@
   ansible.builtin.stat:
     path: "/etc/letsencrypt/live/{{ domain }}/fullchain.pem"
   register: ssl_cert
-  when: not certbot_cert.stat.exists
 
 - name: Update nginx config with SSL
   ansible.builtin.template:
-    src: "{{ playbook_dir }}/../roles/nginx/templates/tildes.nore.gg.j2"
+    src: "{{ playbook_dir }}/../roles/nginx/templates/site.j2"
     dest: "/etc/nginx/sites-available/{{ domain }}"
     owner: root
     group: root
     mode: "0644"
-  when: not certbot_cert.stat.exists and (ssl_cert.stat.exists | default(false))
+  when: ssl_cert.stat.exists
   notify: reload nginx
 
 - name: Enable certbot renewal timer
