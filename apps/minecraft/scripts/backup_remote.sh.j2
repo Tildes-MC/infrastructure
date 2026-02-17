@@ -150,7 +150,7 @@ while read -r filename; do
         if [[ "$file_ts" < "$cutoff" ]]; then
             log "Queueing deletion: $filename ($file_ts)"
             webhook_alert "Queueing deletion: $filename ($file_ts)"
-            log "rm $DIR/$filename" >>"$BATCH_FILE"
+            echo "rm $DIR/$filename" >>"$BATCH_FILE"
         fi
     fi
 done <<<"$CLEAN_LIST"
