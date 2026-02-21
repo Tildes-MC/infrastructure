@@ -6,6 +6,34 @@
   vars:
     restart: false
 
+  pre_tasks:
+    - name: Fetch latest submodule refs
+      ansible.builtin.command:
+        cmd: git fetch --recurse-submodules
+        chdir: "{{ repo_root }}"
+      delegate_to: localhost
+      become: false
+      changed_when: false
+
+    - name: Check git submodule status
+      ansible.builtin.command:
+        cmd: git submodule status --recursive
+        chdir: "{{ repo_root }}"
+      delegate_to: localhost
+      become: false
+      changed_when: false
+      register: submodule_status
+
+    - name: Fail if submodules have updates available
+      ansible.builtin.fail:
+        msg: >-
+          Git submodules have updates available:
+
+          {{ submodule_status.stdout_lines | select('match', '\\+') | join('\n') }}
+
+          Run "git submodule update --remote" to update them.
+      when: submodule_status.stdout is search('\\+')
+
   tasks:
     - name: Run minecraft deploy tasks
       ansible.builtin.include_role:
