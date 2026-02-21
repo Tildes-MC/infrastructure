@@ -1,5 +1,11 @@
 # Tildes MC Server Config/Deployment
 
+## Cloning
+
+```shell
+git clone --recurse-submodules git@github.com:Tildes-MC/minecraft-server.git
+```
+
 ## How to Set Up a Server
 
 This has only been tested with deploying to a Debian 13 host.
