@@ -1,0 +1,3 @@
+[submodule "apps/minecraft/custom-datapacks"]
+	path = apps/minecraft/custom-datapacks
+	url = git@github.com:Tildes-MC/data-packs-mono.git
