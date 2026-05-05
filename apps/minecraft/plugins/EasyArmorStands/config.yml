@@ -6,9 +6,10 @@
 # Do not add comments to this file, they will be removed when the config is saved.
 
 _version:
-  config: 3
+  config: 4
   game: 1.21.3
 editor:
+  allow-entities: true
   allow-players: false
   button:
     interpolation-ticks: 1
@@ -16,21 +17,15 @@ editor:
     threshold: 0.1
   discovery:
     limit: 128
+  flatten-armor-stands: true
   input-hints:
+    drop-key: <key:key.drop>
     enabled: true
     format: '  [<key>] <input>'
     left-click-key: <key:key.attack>
     right-click-key: <key:key.use>
     sneak-key: <lang:key.sneak>
     swap-hands-key: <key:key.swapOffhand>
-  menu:
-    background:
-      config:
-        item:
-          hide-tooltip: true
-          name: ''
-          type: light_blue_stained_glass_pane
-      type: easyarmorstands:background
   scale:
     max-distance: 64.0
     min-distance: 5.0
@@ -88,9 +83,9 @@ message:
     error: <red><message>
     hint: <gray><message>
     hover: <gray><message>
+    link: <aqua><u><message>
     success: <green><message>
     title: '<gold><message>:'
     warning: <yellow><message>
-  server-side-translation: true
 update-check:
   enabled: true
