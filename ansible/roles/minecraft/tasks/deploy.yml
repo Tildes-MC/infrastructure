@@ -16,6 +16,7 @@
     dest: "{{ minecraft_app_dir }}/"
     delete: true
     rsync_opts:
+      - "--copy-links"
       - "--filter=':- .gitignore'"
       - "--exclude=*.j2"
       - "--chmod=D0755,F0644"

@@ -4,7 +4,7 @@ admin_users:
   - name: creesch
     ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCr+322+FOWY2FpvtzXMRZfjnTwn2T6+XeJLilFher2U2cdJ73i7bkp5YhJlJlmTQbscJyKutLx4VVb6xRjhYaXnuidl6CrTQxmf5wWaWvWNoKDsM+QGCaFUAA78rXTq4TEFfyui68ht1zaaS2jXGVhnPKXahDn/eFlKgX1E8/39gnigIPa+hWcWhIkfMoKNpPLl/8ipoPDDW9ZbqE8fGnyb5DyYAM7lCjD90QRurWAvGQO97gkJTXHKmIk+Jwrz/FDADZyqVebSLQJ9Y4W7vDaSft2ClAc1moi551JL9kYsymQMstnaKhK2JgfWfibvq1oZqnlbfu4+UYtZAVdXiZnbFZoiLx+COSTrfeUMWOLyxgwMDiexAh6gTqRvP+4F7iFSkDsyc++pDeLRSvPv45ih8UQ23zEI3XWOQpMQJG2iBF3Sfu5IRprV91Lcgda7pgaxwUXnNKOaxVLLwxZVrOU+zAwdq7Xsxy6cVIFWpCGPcMgHuVkOYARz57L9wSWxa0= creesch"
 
-domain: test.nore.gg
+domain: tildes.nore.gg
 certbot_email: me@danangell.com
 
 minecraft_user: minecraft
@@ -22,9 +22,9 @@ minecraft_port: 25565
 web_port: 3000
 bluemap_port: 8100
 
-java_package: openjdk-21-jre-headless
+java_package: openjdk-25-jre-headless
 node_major_version: "22"
-minecraft_memory: "6G"
+minecraft_memory: "13G"
 minecraft_tmux_session: "minecraft"
 
 repo_root: "{{ playbook_dir }}/../.."

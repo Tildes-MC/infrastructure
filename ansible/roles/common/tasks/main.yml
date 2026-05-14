@@ -13,6 +13,9 @@
       - gnupg
       - ca-certificates
       - cron
+      - python3-debian
+      - vim
+      - htop
     state: present
     update_cache: true
     cache_valid_time: 3600
