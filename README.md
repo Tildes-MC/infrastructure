@@ -3,7 +3,7 @@
 ## Cloning
 
 ```shell
-git clone --recurse-submodules git@github.com:Tildes-MC/minecraft-server.git
+git clone --recurse-submodules git@github.com:Tildes-MC/infrastructure.git
 ```
 
 ## How to Set Up a Server
