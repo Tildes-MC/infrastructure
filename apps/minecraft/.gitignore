@@ -7,16 +7,10 @@
 /bluemap/
 
 # World data
-/world/advancements/
 /world/data/
-/world/entities/
-/world/playerdata/
-/world/poi/
-/world/region/
-/world/stats/
+/world/dimensions/
+/world/players/
 /world/*.*
-/world_nether/
-/world_the_end/
 
 # Server runtime files
 /banned-ips.json
