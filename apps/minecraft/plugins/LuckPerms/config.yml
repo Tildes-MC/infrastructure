@@ -83,7 +83,7 @@ use-server-uuid-cache: false
 #
 # - A H2 database is the default option.
 # - If you want to edit data manually in "traditional" storage files, we suggest using YAML.
-storage-method: json
+storage-method: h2 # [TODO]: Return to json for next iteration of Tildes MC
 
 # The following block defines the settings for remote database storage methods.
 #
