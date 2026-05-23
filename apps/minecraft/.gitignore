@@ -26,12 +26,28 @@
 /plugins/**/*.db
 /plugins/**/*.log
 /plugins/spark/
+/plugins/BlueMap/webserver.conf
 /plugins/BlueMap/maps/
+/plugins/CoreProtect/.license
+/plugins/DHSupport/data.sqlite
+/plugins/GSit/lang/
 /plugins/HexNicks/logs/
 /plugins/HexNicks/nicknames.json
 /plugins/LuckPerms/editor-keystore.json
 /plugins/LuckPerms/json-storage/
+/plugins/LuckPerms/libs/
+/plugins/GSit/lang/
+/plugins/LuckPerms/translations/
+/plugins/WorldEdit/.archive-unpack/
 /plugins/WorldEdit/sessions/
 
 # Scripts runtime data
 /scripts/stats.db
+
+.console_history
+help.yml
+permissions.yml
+server.properties
+usercache.json
+version_history.json
+
