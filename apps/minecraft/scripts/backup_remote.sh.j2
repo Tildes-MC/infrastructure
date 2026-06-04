@@ -71,6 +71,7 @@ LOCAL_FILE="backups/backup-${TIMESTAMP}.tar.gz"
 log "start tar"
 set +e
 tar -czf "${LOCAL_FILE}" \
+    custom-datapacks/ \
     config/ \
     plugins/*.jar \
     plugins/**/*.txt \
@@ -80,8 +81,10 @@ tar -czf "${LOCAL_FILE}" \
     plugins/**/*.db \
     scripts/ \
     world/ \
-    world_nether/ \
-    world_the_end/ \
+    bluemap/web/assets/marker_icons/ \
+    wepif.yml \
+    commands.yml \
+    permissions.yml \
     banned-ips.json \
     banned-players.json \
     bukkit.yml \

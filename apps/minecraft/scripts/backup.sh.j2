@@ -24,6 +24,7 @@ sleep 3
 mkdir -p backups
 TIMESTAMP=$(date '+%Y%m%d-%H-%M-%S')
 tar -czf backups/backup-${TIMESTAMP}.tar.gz \
+    custom-datapacks/ \
     config/ \
     plugins/*.jar \
     plugins/**/*.txt \
@@ -33,8 +34,10 @@ tar -czf backups/backup-${TIMESTAMP}.tar.gz \
     plugins/**/*.db \
     scripts/ \
     world/ \
-    world_nether/ \
-    world_the_end/ \
+    bluemap/web/assets/marker_icons/ \
+    wepif.yml \
+    commands.yml \
+    permissions.yml \
     banned-ips.json \
     banned-players.json \
     bukkit.yml \
