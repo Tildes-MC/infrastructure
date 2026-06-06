@@ -16,6 +16,9 @@ MAX_REMOTE_AGE_DAYS=7
 # setup for discord. Payload will need to be adjusted for other webhook endpoints.
 WEBHOOK_URL="{{ vault_backup_webhook_url }}"
 
+export RCON_PASSWORD="{{ vault_rcon_password }}"
+RCON="$(dirname -- "$0")/rcon.py"
+
 {% raw %}
 set -euo pipefail
 shopt -s globstar
@@ -41,9 +44,6 @@ webhook_alert() {
         log "Warning: Discord webhook failed" >&2
     fi
 }
-
-export RCON_PASSWORD="{{ vault_rcon_password }}"
-RCON="$(dirname -- "$0")/rcon.py"
 
 function cleanup {
     set +e
