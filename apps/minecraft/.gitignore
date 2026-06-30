@@ -40,6 +40,7 @@
 /plugins/LuckPerms/translations/
 /plugins/WorldEdit/.archive-unpack/
 /plugins/WorldEdit/sessions/
+/plugins/WorldGuard/cache/
 
 # Scripts runtime data
 /scripts/stats.db
@@ -50,4 +51,3 @@ permissions.yml
 server.properties
 usercache.json
 version_history.json
-
